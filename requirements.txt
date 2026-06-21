@@ -1,0 +1,5 @@
+requests
+pandas
+websockets
+streamlit>=1.33
+plotly
