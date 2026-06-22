@@ -56,3 +56,13 @@ Run the Streamlit UI:
 ```bash
 streamlit run app.py
 ```
+
+## UI Example Images
+
+Historical Data Charts:
+<img width="1647" height="883" alt="Screenshot 2026-06-22 at 12 53 31 PM" src="https://github.com/user-attachments/assets/9822acdd-98a8-482a-93f5-5180c1176629" />
+<img width="1658" height="711" alt="Screenshot 2026-06-22 at 12 53 36 PM" src="https://github.com/user-attachments/assets/47baaa55-a603-4cd3-8aab-b04cf2462a28" />
+
+Real Time Quotes:
+<img width="1657" height="659" alt="Screenshot 2026-06-22 at 12 54 00 PM" src="https://github.com/user-attachments/assets/b1b3ae3b-e283-4226-9676-fc065a4c4ac1" />
+
