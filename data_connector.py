@@ -1,7 +1,7 @@
 import os
 import asyncio
 import json
-from datetime import datetime
+from datetime import datetime, timezone
 from typing import Callable, Optional, Any
 
 import requests
@@ -32,21 +32,37 @@ class AlpacaDataConnector:
             "APCA-API-SECRET-KEY": self.secret_key,
         }
 
+    @staticmethod
+    def _to_rfc3339(value: Any) -> str:
+        """Serialize a datetime (or pass through a string) as an RFC3339 timestamp.
+
+        Alpaca requires a timezone offset; a naive datetime is assumed to be UTC.
+        """
+        if isinstance(value, datetime):
+            if value.tzinfo is None:
+                value = value.replace(tzinfo=timezone.utc)
+            return value.isoformat()
+        return str(value)
+
     def get_historical(self, symbol: str, start: Optional[Any] = None, end: Optional[Any] = None,
-                       timeframe: str = "1Min", limit: int = 10000) -> pd.DataFrame:
+                       timeframe: str = "1Min", limit: int = 10000,
+                       feed: Optional[str] = None) -> pd.DataFrame:
         """Download historical bars for `symbol`.
 
         start/end can be ISO strings or datetime objects. Pages through Alpaca's
         `next_page_token` automatically so multi-week intraday ranges come back complete.
         Returns a pandas DataFrame indexed by timestamp (column name 't'), with
         OHLCV columns renamed to open/high/low/close/volume.
+
+        `feed` selects the data source (defaults to the connector's data_stream, e.g.
+        "iex"). The default SIP feed requires a paid subscription for recent data.
         """
         url = f"{self.base_url}/v2/stocks/{symbol}/bars"
-        params = {"timeframe": timeframe, "limit": limit}
+        params = {"timeframe": timeframe, "limit": limit, "feed": feed or self.data_stream}
         if start:
-            params["start"] = start.isoformat() if isinstance(start, datetime) else str(start)
+            params["start"] = self._to_rfc3339(start)
         if end:
-            params["end"] = end.isoformat() if isinstance(end, datetime) else str(end)
+            params["end"] = self._to_rfc3339(end)
 
         all_bars = []
         page_token = None

@@ -3,3 +3,4 @@ pandas
 websockets
 streamlit>=1.33
 plotly
+python-dotenv

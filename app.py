@@ -4,8 +4,11 @@ from datetime import datetime, timedelta
 import pandas as pd
 import plotly.graph_objects as go
 import streamlit as st
+from dotenv import load_dotenv
 
 from data_connector import AlpacaDataConnector
+
+load_dotenv()
 
 st.set_page_config(page_title="Alpaca Market Data", layout="wide")
 
