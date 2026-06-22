@@ -1,4 +1,8 @@
+from dotenv import load_dotenv
+
 from data_connector import AlpacaDataConnector
+
+load_dotenv()
 
 def main():
 	# Ensure ALPACA_API_KEY and ALPACA_SECRET_KEY are set in your environment
