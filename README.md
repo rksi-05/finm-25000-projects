@@ -1,17 +1,59 @@
-# Alpaca Data Connector
+# Technical Indicators & Strategy Backtesting with Alpaca
 
-This project provides a small Python module `data_connector.py` that:
+This project is a Streamlit backtesting platform that downloads historical market data from Alpaca, calculates technical indicators, compares multiple long-only strategies, and generates charts plus a final report.
 
-- Loads Alpaca API keys from environment variables
-- Downloads historical bars via Alpaca Market Data REST API (auto-paginated)
-- Streams realtime quotes and trades (bid/ask/last trade) via Alpaca websocket market data stream
+## Features
 
-`app.py` is a Streamlit UI built on top of the connector with two tabs:
+- Downloads at least 5 years of daily OHLCV data from Alpaca
+- Lets the user select common tickers such as AAPL, MSFT, SPY, QQQ, and NVDA or enter a custom ticker
+- Stores historical bars in a Pandas DataFrame
+- Calculates 10 technical indicators across trend, momentum, volatility, and volume
+- Backtests Buy & Hold plus three strategies:
+  - Trend Following
+  - Mean Reversion
+  - Custom Strategy
+- Uses a reusable long-only backtesting engine with $100,000 initial capital, no leverage, and no short selling
+- Tracks portfolio value, daily returns, and trades executed
+- Calculates Total Return, CAGR, Volatility, Sharpe Ratio, Sortino Ratio, Maximum Drawdown, Win Rate, and trade count
+- Displays price charts with indicators and buy/sell signals, equity curves, and drawdown comparisons
+- Produces downloadable Markdown and PDF final reports
+- Keeps the original real-time Alpaca quote streamer
 
-- **Historical Viewer** — pick a ticker, timeframe (1Min/5Min), and lookback window, then see an
-  OHLC candlestick chart with a volume bar chart below it.
-- **Real-Time Quotes** — type a ticker, click "Start streaming", and watch live bid, ask, and last
-  trade price update automatically (polls a background websocket thread once per second).
+## Indicators
+
+Trend:
+- SMA
+- EMA
+- MACD
+- ADX
+
+Momentum:
+- RSI
+- Stochastic Oscillator
+- Williams %R
+
+Volatility:
+- Bollinger Bands
+- ATR
+
+Volume:
+- OBV
+- Chaikin Money Flow
+
+## Strategy Rules
+
+Trend Following:
+- Buy when MACD is above signal, ADX is above 25, and SMA 20 is above SMA 50
+- Sell when those trend conditions are no longer met
+
+Mean Reversion:
+- Buy when RSI is below 30 or price is below the lower Bollinger Band
+- Sell when RSI is above 70 or price is above the upper Bollinger Band
+
+Custom Strategy:
+- Combines trend, momentum, volatility, and volume
+- Buy/hold when SMA 20 is above SMA 50, RSI is between 45 and 70, CMF is positive, and price is above the lower Bollinger Band
+- Exit when those combined conditions are no longer met
 
 ## Setup
 
@@ -21,48 +63,25 @@ Install dependencies:
 pip install -r requirements.txt
 ```
 
-Provide your Alpaca credentials. The app loads them automatically from a `.env`
-file in the project root (via `python-dotenv`). Create one:
+Create a `.env` file in the project root:
 
 ```bash
-# .env  (this file is gitignored — never commit it)
 ALPACA_API_KEY=your_key_here
 ALPACA_SECRET_KEY=your_secret_here
+ALPACA_DATA_STREAM=iex
 ```
 
-Supported variables:
+Supported environment variables:
 
-- `ALPACA_API_KEY` — your Alpaca API key (required)
-- `ALPACA_SECRET_KEY` — your Alpaca secret key (required)
-- `ALPACA_BASE_URL` — override the default data endpoint (optional)
-- `ALPACA_DATA_STREAM` — choose `iex` or `sip` (optional, default: `iex`)
-
-> A free Alpaca plan can only query the `iex` feed for recent data; the `sip`
-> feed requires a paid subscription.
-
-Alternatively, you can set the variables in your shell with `export` instead of
-using a `.env` file.
+- `ALPACA_API_KEY` or `APCA_API_KEY_ID`
+- `ALPACA_SECRET_KEY` or `APCA_API_SECRET`
+- `ALPACA_BASE_URL`, optional, defaults to `https://data.alpaca.markets`
+- `ALPACA_DATA_STREAM`, optional, defaults to `iex`
 
 ## Run
-
-Run the CLI example:
-
-```bash
-python homework1.py
-```
-
-Run the Streamlit UI:
 
 ```bash
 streamlit run app.py
 ```
 
-## UI Example Images
-
-Historical Data Charts:
-<img width="1647" height="883" alt="Screenshot 2026-06-22 at 12 53 31 PM" src="https://github.com/user-attachments/assets/9822acdd-98a8-482a-93f5-5180c1176629" />
-<img width="1658" height="711" alt="Screenshot 2026-06-22 at 12 53 36 PM" src="https://github.com/user-attachments/assets/47baaa55-a603-4cd3-8aab-b04cf2462a28" />
-
-Real Time Quotes:
-<img width="1657" height="659" alt="Screenshot 2026-06-22 at 12 54 00 PM" src="https://github.com/user-attachments/assets/b1b3ae3b-e283-4226-9676-fc065a4c4ac1" />
-
+The main Backtesting tab covers the assignment workflow. The Indicators tab summarizes the implemented indicator set. The Real-Time Quotes tab streams live bid, ask, and last trade data.
